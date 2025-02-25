@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>积分兑换码计算</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 100%;
+            margin: 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 10px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="text"] {
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:active {
+            background-color: #3d8b40;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            word-break: break-all;
+        }
+        h1 {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>恐龙大作战排行榜积分兑换</h1>
+        <div class="input-group">
+            <label for="sterr">请输入兑换码：</label>
+            <input type="text" id="sterr" placeholder="请输入三位大写字母">
+            <button onclick="deal_pcode()">计算</button>
+        </div>
+        <div class="result">
+            <p id="result"></p>
+            <p id="bonus" style="color: red;"></p>
+            <p id="bonusminute"></p>
+            <p style="color: #666;">排行榜积分码为：请填写到游戏内排行榜里进行积分兑换,积分当日有效,每个兑换码可使用6次</p>
+        </div>
+    </div>
+
+    <script>
+        function deal_pcode(){
+            let cal_res = calculate()
+            if (cal_res){
+                let pcode_num = get_bonus_num()
+                let pcode_str = get_pcode_str(pcode_num)
+                document.getElementById("result").innerHTML = "生成的积分码: " + pcode_str;
+                document.getElementById("bonus").innerHTML = "计算成功";
+            }
+            else{
+                document.getElementById("bonus").innerHTML = "计算失败";
+            }
+        }
+
+        function calculate() {
+            let sterr = document.getElementById("sterr").value;
+            let day_num_decoded = pdecode(sterr);
+
+            if (Math.floor(day_num_decoded / 1600) != (get_day_num() % 10)){
+                document.getElementById("result").innerHTML = "兑换码无效";
+                return false;
+            }
+
+            if(day_num_decoded % 1600 % 20 != 0){
+                document.getElementById("result").innerHTML = "兑换码格式错误";
+                return false;
+            }
+
+            return true;
+        }
+
+        function pdecode(pcode){
+            let ch1 = pcode.charCodeAt(0) - 65;
+            let ch2 = pcode.charCodeAt(1) - 65;
+            let ch3 = pcode.charCodeAt(2) - 65;
+            
+            let chnum = ch3 * 26 * 26 + ch2 * 26 + ch1;
+
+            return chnum
+        }
+
+        function get_day_num (){
+            let timestamp = Math.floor(Date.now() / 1000);
+            let dayNum = Math.floor(timestamp / (24 * 60 * 60));
+            dayNum = dayNum;
+            return dayNum;
+        }
+
+        function get_bonus_num (){
+            let dayNum = get_day_num ()
+            dayNum = dayNum % 10
+            let start_num = 1600 * dayNum
+            let radx = Math.floor(Math.random() * 79)
+            return start_num + radx * 17 
+        }
+      
+        function get_pcode_str(pcode_num){
+            let ch1 = pcode_num % 26
+            pcode_num -= pcode_num % 26
+            pcode_num /= 26
+            let ch2 = pcode_num % 26
+            pcode_num -= pcode_num % 26
+            pcode_num /= 26
+            let ch3 = pcode_num % 26
+            
+            let s1 = String.fromCharCode(65 + ch1)
+            let s2 = String.fromCharCode(65 + ch2)
+            let s3 = String.fromCharCode(65 + ch3)
+            
+            return s1 + s2 + s3;
+        }
+    </script>
+</body>
+</html>
